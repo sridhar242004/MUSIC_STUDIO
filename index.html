@@ -1,970 +1,655 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="en">
 <head>
- <meta charset="UTF-8">
- <meta name="viewport" content="width=device-width, initial-scale=1.0">
- <title>Interactive Music Studio</title>
- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
- <style>
-   body {
-     font-family: Arial, sans-serif;
-     background-color: #f0f0f0;
-     margin: 0;
-     padding: 0;
-     display: 0;
-     justify-content: center;
-     align-items: center;
-     height: 100vh;
-     overflow: 0;
-     position: relative;
-   }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeoSonic: Advanced Music Studio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@300;400;700&display=swap');
 
-   .container {
-     width: 100%;
-     max-width: 1300px;
-     background-color: #e6e6e6;
-     padding: 20px;
-     border-radius: 10px;
-     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-     text-align: center;
-   }
+        :root {
+            --primary-color: #00ffff;
+            --secondary-color: #ff00ff;
+            --background-color: #111;
+            --text-color: #fff;
+            --accent-color: #ff9900;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
 
-   h1 {
-     margin-bottom: 20px;
-     color: #333;
-   }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-   .director {
-     margin-bottom: 20px;
-     background-color: #333;
-     color: #fff;
-     padding: 20px;
-     border-radius: 10px;
-   }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
 
-   .controls {
-     margin-bottom: 20px;
-   }
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem;
+            flex-grow: 1;
+        }
 
-   button {
-     padding: 10px 20px;
-     font-size: 16px;
-     border: none;
-     border-radius: 5px;
-     cursor: pointer;
-     margin: 5px;
-     transition: background 0.3s ease-in-out;
-     background-color: #4caf50;
-     color: #fff;
-   }
+        header {
+            text-align: center;
+            margin-bottom: 4rem;
+            position: relative;
+        }
 
-   button:disabled {
-     cursor: not-allowed;
-     background: #ccc;
-   }
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 5rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+            letter-spacing: 4px;
+            position: relative;
+            z-index: 1;
+        }
 
-   .upload-btn {
-     display: none;
-   }
+        h1::before {
+            content: attr(data-text);
+            position: absolute;
+            left: 2px;
+            top: 2px;
+            z-index: -1;
+            background: linear-gradient(45deg, var(--accent-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            opacity: 0.5;
+        }
 
-   #fileUploadLabel {
-     padding: 10px 20px;
-     font-size: 16px;
-     border: none;
-     border-radius: 5px;
-     cursor: pointer;
-     margin: 5px;
-     background-color: #2196f3;
-     color: #fff;
-   }
+        .subtitle {
+            font-size: 1.5rem;
+            opacity: 0.8;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
 
-   #visualizer {
-     margin-bottom: 20px;
-     position: relative;
-     width: 100%;
-     height: 400px;
-     background-color: #333;
-     border-radius: 10px;
-     overflow: hidden;
-     display: flex;
-     justify-content: center;
-     align-items: center;
-   }
+        .neon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
 
-   #visualizerCanvas {
-     width: 100%;
-     height: 100%;
-   }
+        .neon-item {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
 
-   #audioPlayer {
-     position: absolute;
-     top: 10px;
-     left: 10px;
-     width: 300px;
-     height: 50px;
-   }
+        .neon-item:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.2);
+        }
 
-   #lyricsContainer {
-     position: absolute;
-     bottom: 10px;
-     left: 10px;
-     right: 10px;
-     background-color: rgba(255, 255, 255, 0.8);
-     padding: 10px;
-     border-radius: 5px;
-     text-align: left;
-     max-height: 200px;
-     overflow-y: auto;
-   }
+        .neon-item h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+            text-shadow: 0 0 10px var(--primary-color);
+        }
 
-   #report {
-     margin-bottom: 20px;
-   }
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
 
-   #download {
-     display: none;
-     padding: 10px 20px;
-     font-size: 16px;
-     border: none;
-     border-radius: 5px;
-     cursor: pointer;
-     background-color: #2196f3;
-     color: #fff;
-   }
+        button, .upload-btn {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            color: var(--background-color);
+            padding: 1rem 2rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
 
-   .task {
-     margin-bottom: 20px;
-     background-color: #fff;
-     padding: 20px;
-     border-radius: 10px;
-     text-align: left;
-   }
+        button::before, .upload-btn::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(45deg);
+            z-index: 1;
+            transition: all 0.3s ease;
+            opacity: 0;
+        }
 
-   .task h3 {
-     margin-bottom: 10px;
-     color: #333;
-   }
+        button:hover::before, .upload-btn:hover::before {
+            left: -100%;
+            top: -100%;
+            opacity: 1;
+        }
 
-   .task p {
-     color: #666;
-   }
+        button:hover, .upload-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px var(--primary-color);
+        }
 
-   .music-notes-container {
-     position: absolute;
-     bottom: 10px;
-     left: 50%;
-     transform: translateX(-50%);
-   }
+        #visualizer {
+            width: 100%;
+            height: 400px;
+            background: var(--glass-bg);
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 2rem;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+        }
 
-   .music-notes {
-     font-size: 24px;
-     color: #2196f3;
-     opacity: 0;
-     animation: flowMusicNotes 5s linear infinite;
-   }
+        #visualizerCanvas {
+            width: 100%;
+            height: 100%;
+        }
 
-   @keyframes flowMusicNotes {
-     0% {
-       opacity: 0;
-       transform: translateY(100%);
-     }
-     100% {
-       opacity: 1;
-       transform: translateY(-100%);
-     }
-   }
+        #audioPlayer {
+            width: 100%;
+            margin-top: 1rem;
+            background: var(--glass-bg);
+            border-radius: 30px;
+            padding: 1rem;
+        }
 
-   /* New CSS styles */
-   #lyricsInput {
-     width: 80%;
-     margin: 10px auto;
-     padding: 10px;
-     border: 1px solid #ccc;
-     border-radius: 5px;
-   }
+        #lyricsContainer {
+            margin-top: 2rem;
+            padding: 2rem;
+            background: var(--glass-bg);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+        }
 
-   /* Additional button effects */
-   button:hover {
-     background-color: #45a049;
-   }
+        #lyricsInput {
+            width: 100%;
+            padding: 1rem;
+            margin-top: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            border-radius: 10px;
+            color: var(--text-color);
+            font-family: 'Roboto', sans-serif;
+            resize: vertical;
+        }
 
-   button:active {
-     background-color: #3e8e41;
-   }
+        .task {
+            margin-top: 2rem;
+            padding: 2rem;
+            background: var(--glass-bg);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            transition: all 0.3s ease;
+        }
 
-   button:focus {
-     outline: none;
-     box-shadow: 0 0 5px #45a049;
-   }
-   /* Additional music-related button effects */
+        .task:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 255, 255, 0.2);
+        }
 
-/* Play button animation */
-@keyframes playButton {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.1);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
+        .task h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+        }
 
-/* Pause button animation */
-@keyframes pauseButton {
-  0% {
-    transform: scaleX(1);
-  }
-  50% {
-    transform: scaleX(0.8);
-  }
-  100% {
-    transform: scaleX(1);
-  }
-}
+        .music-notes-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            font-size: 2rem;
+            color: var(--accent-color);
+            z-index: 1000;
+        }
 
-/* Bass boost button animation */
-@keyframes bassBoostButton {
-  0% {
-    background-color: #4caf50;
-  }
-  50% {
-    background-color: #2196f3;
-  }
-  100% {
-    background-color: #4caf50;
-  }
-}
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
 
-/* Tempo button animation */
-@keyframes tempoButton {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
+        .music-notes {
+            animation: float 3s ease-in-out infinite;
+            text-shadow: 0 0 10px var(--accent-color);
+        }
 
-/* Pitch button animation */
-@keyframes pitchButton {
-  0% {
-    color: #fff;
-  }
-  50% {
-    color: #f44336;
-  }
-  100% {
-    color: #fff;
-  }
-}
+        .glow-effect {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(0, 255, 255, 0.2), transparent 50%);
+            opacity: 0.5;
+            z-index: -1;
+            animation: pulse 4s infinite;
+        }
 
-/* Equalizer button animation */
-@keyframes equalizerButton {
-  0% {
-    background-color: #4caf50;
-  }
-  50% {
-    background-color: #ff9800;
-  }
-  100% {
-    background-color: #4caf50;
-  }
-}
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 0.3; }
+            100% { transform: scale(1); opacity: 0.5; }
+        }
 
-/* Visualizer button animation */
-@keyframes visualizerButton {
-  0% {
-    background-color: #4caf50;
-  }
-  50% {
-    background-color: #9c27b0;
-  }
-  100% {
-    background-color: #4caf50;
-  }
-}
-
-/* Recognize lyrics button animation */
-@keyframes recognizeLyricsButton {
-  0% {
-    background-color: #2196f3;
-  }
-  50% {
-    background-color: #ff5722;
-  }
-  100% {
-    background-color: #2196f3;
-  }
-}
-
-/* Upload button animation */
-@keyframes uploadButton {
-  0% {
-    background-color: #2196f3;
-  }
-  50% {
-    background-color: #f44336;
-  }
-  100% {
-    background-color: #2196f3;
-  }
-}
-
-/* Download button animation */
-@keyframes downloadButton {
-  0% {
-    background-color: #2196f3;
-  }
-  50% {
-    background-color: #8bc34a;
-  }
-  100% {
-    background-color: #2196f3;
-  }
-}
-
-/* Music notes animation */
-@keyframes musicNotesAnimation {
-  0% {
-    opacity: 0;
-    transform: translateY(100%);
-  }
-  50% {
-    opacity: 1;
-    transform: translateY(-50%);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-100%);
-  }
-}
-
-/* Bass boost effect */
-#bassBoostBtn:hover {
-  animation: bassBoostButton 0.5s infinite alternate;
-}
-
-/* Tempo effect */
-#tempoBtn:hover {
-  animation: tempoButton 0.5s infinite linear;
-}
-
-/* Pitch effect */
-#pitchBtn:hover {
-  animation: pitchButton 0.5s infinite alternate;
-}
-
-/* Equalizer effect */
-#equalizerBtn:hover {
-  animation: equalizerButton 0.5s infinite alternate;
-}
-
-/* Visualizer effect */
-#visualizerBtn:hover {
-  animation: visualizerButton 0.5s infinite alternate;
-}
-
-/* Recognize lyrics effect */
-#recognizeLyricsBtn:hover {
-  animation: recognizeLyricsButton 0.5s infinite alternate;
-}
-
-/* Upload effect */
-#fileUploadLabel:hover {
-  animation: uploadButton 0.5s infinite alternate;
-}
-
-/* Download effect */
-#download:hover {
-  animation: downloadButton 0.5s infinite alternate;
-}
-
-/* Music notes effect */
-.music-notes {
-  animation: musicNotesAnimation 5s linear infinite;
-}
-/* Additional music-related CSS effects */
-
-/* Record button animation */
-@keyframes recordButton {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.1);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-/* Stop button animation */
-@keyframes stopButton {
-  0% {
-    background-color: #f44336;
-  }
-  50% {
-    background-color: #ff9800;
-  }
-  100% {
-    background-color: #f44336;
-  }
-}
-
-/* Skip button animation */
-@keyframes skipButton {
-  0% {
-    background-color: #9c27b0;
-  }
-  50% {
-    background-color: #ffeb3b;
-  }
-  100% {
-    background-color: #9c27b0;
-  }
-}
-
-/* Repeat button animation */
-@keyframes repeatButton {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-/* Shuffle button animation */
-@keyframes shuffleButton {
-  0% {
-    background-color: #ff5722;
-  }
-  50% {
-    background-color: #00bcd4;
-  }
-  100% {
-    background-color: #ff5722;
-  }
-}
-
-/* Volume up button animation */
-@keyframes volumeUpButton {
-  0% {
-    color: #fff;
-  }
-  50% {
-    color: #4caf50;
-  }
-  100% {
-    color: #fff;
-  }
-}
-
-/* Volume down button animation */
-@keyframes volumeDownButton {
-  0% {
-    color: #fff;
-  }
-  50% {
-    color: #f44336;
-  }
-  100% {
-    color: #fff;
-  }
-}
-
-/* Rewind button animation */
-@keyframes rewindButton {
-  0% {
-    background-color: #ff9800;
-  }
-  50% {
-    background-color: #8bc34a;
-  }
-  100% {
-    background-color: #ff9800;
-  }
-}
-
-/* Forward button animation */
-@keyframes forwardButton {
-  0% {
-    background-color: #00bcd4;
-  }
-  50% {
-    background-color: #673ab7;
-  }
-  100% {
-    background-color: #00bcd4;
-  }
-}
-
-/* Play/Pause button animation */
-@keyframes playPauseButton {
-  0% {
-    transform: scaleX(1);
-  }
-  50% {
-    transform: scaleX(0.8);
-  }
-  100% {
-    transform: scaleX(1);
-  }
-}
-
-/* Loop button animation */
-@keyframes loopButton {
-  0% {
-    background-color: #8bc34a;
-  }
-  50% {
-    background-color: #ff5722;
-  }
-  100% {
-    background-color: #8bc34a;
-  }
-}
-
-/* Mute button animation */
-@keyframes muteButton {
-  0% {
-    background-color: #f44336;
-  }
-  50% {
-    background-color: #ffeb3b;
-  }
-  100% {
-    background-color: #f44336;
-  }
-}
-
-/* Lyrics button animation */
-@keyframes lyricsButton {
-  0% {
-    background-color: #2196f3;
-  }
-  50% {
-    background-color: #ff5722;
-  }
-  100% {
-    background-color: #2196f3;
-  }
-}
-
-/* Microphone button animation */
-@keyframes microphoneButton {
-  0% {
-    background-color: #ff5722;
-  }
-  50% {
-    background-color: #4caf50;
-  }
-  100% {
-    background-color: #ff5722;
-  }
-}
-
-/* Guitar button animation */
-@keyframes guitarButton {
-  0% {
-    background-color: #673ab7;
-  }
-  50% {
-    background-color: #ff9800;
-  }
-  100% {
-    background-color: #673ab7;
-  }
-}
-
-/* Drums button animation */
-@keyframes drumsButton {
-  0% {
-    background-color: #ffeb3b;
-  }
-  50% {
-    background-color: #2196f3;
-  }
-  100% {
-    background-color: #ffeb3b;
-  }
-}
-
-/* Piano button animation */
-@keyframes pianoButton {
-  0% {
-    background-color: #4caf50;
-  }
-  50% {
-    background-color: #f44336;
-  }
-  100% {
-    background-color: #4caf50;
-  }
-}
-
- </style>
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 3rem;
+            }
+            .neon-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
- <div class="container">
-   <h1>Interactive Music Studio</h1>
-   <div class="director">
-     <h2>Music Director Tutor</h2>
-     <p>Welcome! I am your Music Director Tutor. Follow my instructions to create amazing recordings.</p>
+    <div class="container">
+        <header>
+            <h1 data-text="NeoSonic">NeoSonic</h1>
+            <p class="subtitle">Experience the Future of Music Creation</p>
+            <div class="glow-effect"></div>
+        </header>
+
+        <div class="neon-grid">
+            <div class="neon-item">
+                <h2>Record & Upload</h2>
+                <div class="controls">
+                    <label for="uploadBtn" class="upload-btn"><i class="fas fa-upload"></i> Upload Song</label>
+                    <input type="file" id="uploadBtn" style="display: none;" accept=".mp3,.wav">
+                    <button id="startBtn"><i class="fas fa-microphone-alt"></i> Record</button>
+                    <button id="stopBtn" disabled><i class="fas fa-stop-circle"></i> Stop</button>
+                </div>
+            </div>
+
+            <div class="neon-item">
+                <h2>Audio Alchemy</h2>
+                <div class="controls">
+                    <button id="bassBoostBtn"><i class="fas fa-volume-up"></i> Bass Boost</button>
+                    <button id="tempoBtn"><i class="fas fa-music"></i> Tempo Shift</button>
+                    <button id="pitchBtn"><i class="fas fa-arrow-up"></i> Pitch Bend</button>
+                    <button id="equalizerBtn"><i class="fas fa-sliders-h"></i> Equalizer</button>
+                    <button id="reverbEchoBtn"><i class="fas fa-headphones"></i> Spatial FX</button>
+                </div>
+            </div>
+
+            <div class="neon-item">
+                <h2>Lyrical Nexus</h2>
+                <div class="controls">
+                    <button id="recognizeLyricsBtn"><i class="fas fa-magic"></i> AI Lyric Recognition</button>
+                </div>
+                <textarea id="lyricsInput" placeholder="Craft your lyrics here..."></textarea>
+            </div>
+        </div>
+
+        <div id="visualizer">
+            <canvas id="visualizerCanvas"></canvas>
+        </div>
+        <audio id="audioPlayer" controls></audio>
+
+        <div id="lyricsContainer"></div>
+
+        <div id="report"></div>
+
+        <a id="download" download="neosonic_creation.mp3" style="display: none;" class="upload-btn"><i class="fas fa-download"></i> Download Your Creation</a>
+
+        <div class="task" id="task1">
+            <h3>Mission 1: Vocal Calibration</h3>
+            <p>Initiate a simple scale recording to calibrate your vocal interface.</p>
+        </div>
+
+        <div class="task" id="task2" style="display: none;">
+            <h3>Mission 2: Melodic Synthesis</h3>
+            <p>Compose a foundational melody using your calibrated vocal range.</p>
+        </div>
+
+        <div class="task" id="task3" style="display: none;">
+            <h3>Mission 3: Sonic Enhancement</h3>
+            <p>Apply spatial and reverb effects to elevate your melodic creation.</p>
+        </div>
+
+        <div class="task" id="task4" style="display: none;">
+            <h3>Mission 4: Lyrical Analysis</h3>
+            <div id="recognizedLyrics"></div>
+        </div>
     </div>
-    <div class="controls">
-      <label for="uploadBtn" id="fileUploadLabel"><i class="fas fa-upload"></i> Upload Song</label>
-      <input type="file" id="uploadBtn" class="upload-btn" accept=".mp3,.wav">
-      <button id="startBtn"><i class="fas fa-microphone-alt"></i> Record</button>
-      <button id="stopBtn" disabled><i class="fas fa-stop-circle"></i> Stop</button>
-      <button id="bassBoostBtn"><i class="fas fa-volume-up"></i> Bass Boost</button>
-      <button id="tempoBtn"><i class="fas fa-music"></i> Change Tempo</button>
-      <button id="pitchBtn"><i class="fas fa-arrow-up"></i> Change Pitch</button>
-      <button id="equalizerBtn"><i class="fas fa-sliders-h"></i> Equalizer</button>
-      <button id="reverbEchoBtn"><i class="fas fa-headphones"></i> Reverb & Echo</button>
-      <!-- New button for manual lyrics recognition -->
-      <button id="recognizeLyricsBtn"><i class="fas fa-music"></i> Recognize Lyrics</button>
-      <!-- New textarea for manual lyrics input -->
-      <textarea id="lyricsInput" placeholder="Enter lyrics manually"></textarea>
-    </div>
-    
-    <div id="visualizer">
-      <canvas id="visualizerCanvas"></canvas>
-      <audio id="audioPlayer" controls></audio>
-      <div id="lyricsContainer"></div>
-    </div>
-    <div id="report"></div>
-    <a id="download" download="recording.mp3"><i class="fas fa-download"></i> Download Recording</a>
-    <!-- New section for displaying recognized lyrics -->
-    <div class="task" id="task4" style="display: none;">
-      <h3>Task 4: Recognized Lyrics</h3>
-      <div id="recognizedLyrics"></div>
-    </div>
-    <div class="task" id="task1">
-     <h3>Task 1: Warm-Up</h3>
-     <p>Start by recording a simple scale to warm up your voice.</p>
-    </div>
-    <div class="task" id="task2" style="display: none;">
-      <h3>Task 2: Basic Melody</h3>
-      <p>Record a basic melody using the notes you practiced.</p>
-    </div>
-    <div class="task" id="task3" style="display: none;">
-      <h3>Task 3: Add Effects</h3>
-      <p>Apply reverb and echo effects to your melody to enhance it.</p>
-    </div>
+
     <div class="music-notes-container">
-      <div class="music-notes">♫</div>
-      <div class="music-notes">♪</div>
-      <div class="music-notes">♫</div>
-      <div class="music-notes">♪</div>
-      <div class="music-notes">♫</div>
+        <div class="music-notes">♫</div>
+        <div class="music-notes">♪</div>
+        <div class="music-notes">♫</div>
     </div>
-  </div>
-  <script src="https://cdn.jsdelivr.net/npm/tamil-web-utils@1.0.0/dist/tamil-web-utils.min.js"></script>
-  <script>
-   const startBtn = document.getElementById('startBtn');
-   const stopBtn = document.getElementById('stopBtn');
-   const bassBoostBtn = document.getElementById('bassBoostBtn');
-   const tempoBtn = document.getElementById('tempoBtn');
-   const pitchBtn = document.getElementById('pitchBtn');
-   const equalizerBtn = document.getElementById('equalizerBtn');
-   const recognizeLyricsBtn = document.getElementById('recognizeLyricsBtn');
-   const lyricsInput = document.getElementById('lyricsInput');
-   const visualizerCanvas = document.getElementById('visualizerCanvas');
-   const report = document.getElementById('report');
-   const download = document.getElementById('download');
-   const uploadBtn = document.getElementById('uploadBtn');
-   const fileUploadLabel = document.getElementById('fileUploadLabel');
-   const tasks = [
-     document.getElementById('task1'),
-     document.getElementById('task2'),
-     document.getElementById('task3'),
-     document.getElementById('task4')
-   ];
-   const audioPlayer = document.getElementById('audioPlayer');
-   const lyricsContainer = document.getElementById('lyricsContainer');
-   const recognizedLyricsContainer = document.getElementById('recognizedLyrics');
-   let currentTask = 0;
-   let mediaRecorder;
-   let audioChunks = [];
-   let audioContext;
-   let analyser;
-   let animationFrameId;
- 
-   // Add event listeners for buttons
-   startBtn.addEventListener('click', startRecording);
-   stopBtn.addEventListener('click', stopRecording);
-   uploadBtn.addEventListener('change', handleFileUpload);
-   bassBoostBtn.addEventListener('click', applyBassBoost);
-   tempoBtn.addEventListener('click', changeTempo);
-   pitchBtn.addEventListener('click', changePitch);
-   equalizerBtn.addEventListener('click', openEqualizer);
-   recognizeLyricsBtn.addEventListener('click', recognizeLyrics);
- 
-   function speak(text) {
-     const speech = new SpeechSynthesisUtterance(text);
-     speechSynthesis.speak(speech);
+
+    <script src="https://cdn.jsdelivr.net/npm/tamil-web-utils@1.0.0/dist/tamil-web-utils.min.js"></script>
+    <script>
+      const startBtn = document.getElementById('startBtn');
+      const stopBtn = document.getElementById('stopBtn');
+      const bassBoostBtn = document.getElementById('bassBoostBtn');
+      const tempoBtn = document.getElementById('tempoBtn');
+      const pitchBtn = document.getElementById('pitchBtn');
+      const equalizerBtn = document.getElementById('equalizerBtn');
+      const recognizeLyricsBtn = document.getElementById('recognizeLyricsBtn');
+      const lyricsInput = document.getElementById('lyricsInput');
+      const visualizerCanvas = document.getElementById('visualizerCanvas');
+      const report = document.getElementById('report');
+      const download = document.getElementById('download');
+      const uploadBtn = document.getElementById('uploadBtn');
+      const fileUploadLabel = document.getElementById('fileUploadLabel');
+      const tasks = [
+        document.getElementById('task1'),
+        document.getElementById('task2'),
+        document.getElementById('task3'),
+        document.getElementById('task4')
+      ];
+      const audioPlayer = document.getElementById('audioPlayer');
+      const lyricsContainer = document.getElementById('lyricsContainer');
+      const recognizedLyricsContainer = document.getElementById('recognizedLyrics');
+      let currentTask = 0;
+      let mediaRecorder;
+      let audioChunks = [];
+      let audioContext;
+      let analyser;
+      let animationFrameId;
+    
+      // Add event listeners for buttons
+      startBtn.addEventListener('click', startRecording);
+      stopBtn.addEventListener('click', stopRecording);
+      uploadBtn.addEventListener('change', handleFileUpload);
+      bassBoostBtn.addEventListener('click', applyBassBoost);
+      tempoBtn.addEventListener('click', changeTempo);
+      pitchBtn.addEventListener('click', changePitch);
+      equalizerBtn.addEventListener('click', openEqualizer);
+      recognizeLyricsBtn.addEventListener('click', recognizeLyrics);
+    
+      function speak(text) {
+        const speech = new SpeechSynthesisUtterance(text);
+        speechSynthesis.speak(speech);
+      }
+    
+      function initAudioContext() {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioContext.createAnalyser();
+      }
+    
+      async function startRecording() {
+        try {
+          initAudioContext();
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          const source = audioContext.createMediaStreamSource(stream);
+          source.connect(analyser);
+          mediaRecorder = new MediaRecorder(stream);
+    
+          mediaRecorder.addEventListener('dataavailable', event => {
+            audioChunks.push(event.data);
+          });
+    
+          mediaRecorder.addEventListener('stop', handleRecordingStop);
+    
+          mediaRecorder.start();
+          startBtn.disabled = true;
+          stopBtn.disabled = false;
+          report.innerHTML = 'Recording...';
+          audioChunks = [];
+          visualizeAudio();
+          speak('Recording started. Please perform the required task.');
+        } catch (error) {
+          report.innerHTML = 'Error accessing the microphone. Please check your microphone settings.';
+          speak('Error accessing the microphone. Please check your microphone settings.');
+          console.error('Error accessing the microphone:', error);
+        }
+      }
+    
+      function stopRecording() {
+        mediaRecorder.stop();
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+        cancelAnimationFrame(animationFrameId);
+        speak('Recording stopped. Please wait while we process the audio.');
+      }
+    
+      function handleRecordingStop() {
+        const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
+        const audioUrl = URL.createObjectURL(audioBlob);
+        const audio = new Audio(audioUrl);
+        const audioSource = document.createElement('source');
+        audioSource.src = audioUrl;
+        audioSource.type = 'audio/mp3';
+        visualizer.innerHTML = '';
+        visualizer.appendChild(audioSource);
+        download.href = audioUrl;
+        download.style.display = 'block';
+        download.download = 'recording.mp3';
+        report.innerHTML = 'Recording complete!';
+        speak('Recording complete!');
+        tasks[currentTask].style.display = 'none';
+        currentTask++;
+        if (currentTask < tasks.length) {
+          tasks[currentTask].style.display = 'block';
+   switch (currentTask) {
+   case 1:
+   speak('Now, record a basic melody using the notes you practiced.');
+   break;
+   case 2:
+   speak('Apply reverb and echo effects to your melody to enhance it.');
+   break;
+   case 3:
+   speak('Recognize the lyrics or enter them manually.');
+   break;
    }
- 
-   function initAudioContext() {
-     audioContext = new (window.AudioContext || window.webkitAudioContext)();
-     analyser = audioContext.createAnalyser();
+   } else {
+   report.innerHTML = 'You have completed all tasks!';
+   speak('You have completed all tasks!');
    }
- 
-   async function startRecording() {
-     try {
-       initAudioContext();
-       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-       const source = audioContext.createMediaStreamSource(stream);
-       source.connect(analyser);
-       mediaRecorder = new MediaRecorder(stream);
- 
-       mediaRecorder.addEventListener('dataavailable', event => {
-         audioChunks.push(event.data);
-       });
- 
-       mediaRecorder.addEventListener('stop', handleRecordingStop);
- 
-       mediaRecorder.start();
-       startBtn.disabled = true;
-       stopBtn.disabled = false;
-       report.innerHTML = 'Recording...';
-       audioChunks = [];
-       visualizeAudio();
-       speak('Recording started. Please perform the required task.');
-     } catch (error) {
-       report.innerHTML = 'Error accessing the microphone. Please check your microphone settings.';
-       speak('Error accessing the microphone. Please check your microphone settings.');
-       console.error('Error accessing the microphone:', error);
-     }
    }
- 
-   function stopRecording() {
-     mediaRecorder.stop();
-     startBtn.disabled = false;
-     stopBtn.disabled = true;
-     cancelAnimationFrame(animationFrameId);
-     speak('Recording stopped. Please wait while we process the audio.');
+   
+   function handleFileUpload(event) {
+   const file = event.target.files[0];
+   if (file) {
+   const reader = new FileReader();
+   reader.onload = function (e) {
+   audioPlayer.src = e.target.result;
+   visualizer.innerHTML = '';
+   visualizer.appendChild(audioPlayer);
+   analyzeAudio(file);
+   };
+   reader.readAsDataURL(file);
    }
- 
-   function handleRecordingStop() {
-     const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
-     const audioUrl = URL.createObjectURL(audioBlob);
-     const audio = new Audio(audioUrl);
-     const audioSource = document.createElement('source');
-     audioSource.src = audioUrl;
-     audioSource.type = 'audio/mp3';
-     visualizer.innerHTML = '';
-     visualizer.appendChild(audioSource);
-     download.href = audioUrl;
-     download.style.display = 'block';
-     download.download = 'recording.mp3';
-     report.innerHTML = 'Recording complete!';
-     speak('Recording complete!');
+   }
+   
+   async function analyzeAudio(file) {
+   report.innerHTML = 'Analyzing the uploaded song...';
+   speak('Analyzing the uploaded song...');
+   try {
+   const audioContext = new AudioContext();
+   const audioBuffer = await audioContext.decodeAudioData(await file.arrayBuffer());
+   const offlineContext = new OfflineAudioContext(audioBuffer.numberOfChannels, audioBuffer.length, audioBuffer.sampleRate);
+   const source = offlineContext.createBufferSource();
+   source.buffer = audioBuffer;
+   source.connect(offlineContext.destination);
+   source.start();
+   const renderedBuffer = await offlineContext.startRendering();
+   const lyrics = await recognizeLyrics(renderedBuffer);
+   
+   report.innerHTML = 'Lyrics and music notes created successfully!';
+   speak('Lyrics and music notes created successfully!');
+   displayLyricsAndNotes(lyrics);
+   } catch (error) {
+   report.innerHTML = 'Error analyzing the audio file.';
+   speak('Error analyzing the audio file.');
+   console.error('Error analyzing the audio file:', error);
+   }
+   }
+   
+   async function recognizeLyrics(audioBuffer) {
+   const recognition = new webkitSpeechRecognition();
+   recognition.lang = 'ta-IN';
+   recognition.continuous = true;
+   recognition.interimResults = true;
+   return new Promise((resolve) => {
+   recognition.onresult = (event) => {
+   let lyrics = '';
+   for (let i = event.resultIndex; i < event.results.length; i++) {
+   if (event.results[i].isFinal) {
+   lyrics += event.results[i][0].transcript;
+   }
+   }
+   resolve(lyrics);
+   };
+   recognition.onerror = (event) => {
+     console.error('Speech recognition error:', event.error);
+     resolve('');
+   };
+   
+   recognition.onend = () => {
+     resolve('');
+   };
+   
+   const audioContext = new AudioContext();
+   const source = audioContext.createBufferSource();
+   source.buffer = audioBuffer;
+   source.connect(audioContext.destination);
+   source.start();
+   
+   recognition.start();
+   });
+   }
+   
+   function displayLyricsAndNotes(lyrics) {
+     const lyricsHeading = document.createElement('h3');
+     lyricsHeading.textContent = 'Lyrics:';
+     const lyricsParagraph = document.createElement('p');
+     lyricsParagraph.textContent = lyrics;
+     lyricsContainer.innerHTML = ''; // Clear previous content
+     lyricsContainer.appendChild(lyricsHeading);
+     lyricsContainer.appendChild(lyricsParagraph);
+   }
+   
+   function recognizeLyrics() {
+     const manualLyrics = lyricsInput.value;
+     const recognizedLyricsHeading = document.createElement('h3');
+     recognizedLyricsHeading.textContent = 'Recognized Lyrics:';
+     const recognizedLyricsParagraph = document.createElement('p');
+     recognizedLyricsParagraph.textContent = manualLyrics;
+     recognizedLyricsContainer.innerHTML = ''; // Clear previous content
+     recognizedLyricsContainer.appendChild(recognizedLyricsHeading);
+     recognizedLyricsContainer.appendChild(recognizedLyricsParagraph);
+     tasks[3].style.display = 'block';
      tasks[currentTask].style.display = 'none';
      currentTask++;
-     if (currentTask < tasks.length) {
-       tasks[currentTask].style.display = 'block';
-switch (currentTask) {
-case 1:
-speak('Now, record a basic melody using the notes you practiced.');
-break;
-case 2:
-speak('Apply reverb and echo effects to your melody to enhance it.');
-break;
-case 3:
-speak('Recognize the lyrics or enter them manually.');
-break;
-}
-} else {
-report.innerHTML = 'You have completed all tasks!';
-speak('You have completed all tasks!');
-}
-}
-
-function handleFileUpload(event) {
-const file = event.target.files[0];
-if (file) {
-const reader = new FileReader();
-reader.onload = function (e) {
-audioPlayer.src = e.target.result;
-visualizer.innerHTML = '';
-visualizer.appendChild(audioPlayer);
-analyzeAudio(file);
-};
-reader.readAsDataURL(file);
-}
-}
-
-async function analyzeAudio(file) {
-report.innerHTML = 'Analyzing the uploaded song...';
-speak('Analyzing the uploaded song...');
-try {
-const audioContext = new AudioContext();
-const audioBuffer = await audioContext.decodeAudioData(await file.arrayBuffer());
-const offlineContext = new OfflineAudioContext(audioBuffer.numberOfChannels, audioBuffer.length, audioBuffer.sampleRate);
-const source = offlineContext.createBufferSource();
-source.buffer = audioBuffer;
-source.connect(offlineContext.destination);
-source.start();
-const renderedBuffer = await offlineContext.startRendering();
-const lyrics = await recognizeLyrics(renderedBuffer);
-
-report.innerHTML = 'Lyrics and music notes created successfully!';
-speak('Lyrics and music notes created successfully!');
-displayLyricsAndNotes(lyrics);
-} catch (error) {
-report.innerHTML = 'Error analyzing the audio file.';
-speak('Error analyzing the audio file.');
-console.error('Error analyzing the audio file:', error);
-}
-}
-
-async function recognizeLyrics(audioBuffer) {
-const recognition = new webkitSpeechRecognition();
-recognition.lang = 'ta-IN';
-recognition.continuous = true;
-recognition.interimResults = true;
-return new Promise((resolve) => {
-recognition.onresult = (event) => {
-let lyrics = '';
-for (let i = event.resultIndex; i < event.results.length; i++) {
-if (event.results[i].isFinal) {
-lyrics += event.results[i][0].transcript;
-}
-}
-resolve(lyrics);
-};
-recognition.onerror = (event) => {
-  console.error('Speech recognition error:', event.error);
-  resolve('');
-};
-
-recognition.onend = () => {
-  resolve('');
-};
-
-const audioContext = new AudioContext();
-const source = audioContext.createBufferSource();
-source.buffer = audioBuffer;
-source.connect(audioContext.destination);
-source.start();
-
-recognition.start();
-});
-}
-
-function displayLyricsAndNotes(lyrics) {
-  const lyricsHeading = document.createElement('h3');
-  lyricsHeading.textContent = 'Lyrics:';
-  const lyricsParagraph = document.createElement('p');
-  lyricsParagraph.textContent = lyrics;
-  lyricsContainer.innerHTML = ''; // Clear previous content
-  lyricsContainer.appendChild(lyricsHeading);
-  lyricsContainer.appendChild(lyricsParagraph);
-}
-
-function recognizeLyrics() {
-  const manualLyrics = lyricsInput.value;
-  const recognizedLyricsHeading = document.createElement('h3');
-  recognizedLyricsHeading.textContent = 'Recognized Lyrics:';
-  const recognizedLyricsParagraph = document.createElement('p');
-  recognizedLyricsParagraph.textContent = manualLyrics;
-  recognizedLyricsContainer.innerHTML = ''; // Clear previous content
-  recognizedLyricsContainer.appendChild(recognizedLyricsHeading);
-  recognizedLyricsContainer.appendChild(recognizedLyricsParagraph);
-  tasks[3].style.display = 'block';
-  tasks[currentTask].style.display = 'none';
-  currentTask++;
-  report.innerHTML = 'Manual lyrics recognition complete!';
-  speak('Manual lyrics recognition complete!');
-}
-
-
-function applyBassBoost() {
-report.innerHTML = 'Applying bass boost...';
-speak('Applying bass boost...');
-setTimeout(() => {
-report.innerHTML = 'Bass boost applied successfully!';
-speak('Bass boost applied successfully!');
-}, 2000);
-}
-
-function changeTempo() {
-report.innerHTML = 'Changing tempo...';
-speak('Changing tempo...');
-setTimeout(() => {
-report.innerHTML = 'Tempo changed successfully!';
-speak('Tempo changed successfully!');
-}, 2000);
-}
-
-function changePitch() {
-report.innerHTML = 'Changing pitch...';
-speak('Changing pitch...');
-setTimeout(() => {
-report.innerHTML = 'Pitch changed successfully!';
-speak('Pitch changed successfully!');
-}, 2000);
-}
-
-function openEqualizer() {
-report.innerHTML = 'Opening equalizer...';
-speak('Opening equalizer...');
-setTimeout(() => {
-report.innerHTML = 'Equalizer opened!';
-speak('Equalizer opened!');
-}, 2000);
-}
-const reverbEchoBtn = document.getElementById('reverbEchoBtn');
-
-// Add event listener for reverb and echo button
-reverbEchoBtn.addEventListener('click', applyReverbAndEcho);
-
-function applyReverbAndEcho() {
-  // Logic to apply reverb and echo effects to the melody
-  report.innerHTML = 'Applying reverb and echo effects...';
-  speak('Applying reverb and echo effects...');
-  setTimeout(() => {
-    report.innerHTML = 'Reverb and echo effects applied successfully!';
-    speak('Reverb and echo effects applied successfully!');
-  }, 2000);
-}
-
-
-function visualizeAudio() {
-const canvas = visualizerCanvas;
-const canvasCtx = canvas.getContext('2d');
-const WIDTH = canvas.width;
-const HEIGHT = canvas.height;
-const bufferLength = analyser.frequencyBinCount;
-const dataArray = new Uint8Array(bufferLength);
-
-function animate() {
-  animationFrameId = requestAnimationFrame(animate);
-  analyser.getByteFrequencyData(dataArray);
-
-  canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
-
-  const barWidth = (WIDTH / bufferLength) * 2.5;
-  let barHeight;
-  let x = 0;
-
-  for (let i = 0; i < bufferLength; i++) {
-    barHeight = dataArray[i] / 2;
-
-    canvasCtx.fillStyle = `rgb(${barHeight + 100},50,50)`;
-    canvasCtx.fillRect(x, HEIGHT - barHeight, barWidth, barHeight);
-
-    x += barWidth + 1;
-  }
-}
-
-animate();
-}
-</script>
-
+     report.innerHTML = 'Manual lyrics recognition complete!';
+     speak('Manual lyrics recognition complete!');
+   }
+   
+   
+   function applyBassBoost() {
+   report.innerHTML = 'Applying bass boost...';
+   speak('Applying bass boost...');
+   setTimeout(() => {
+   report.innerHTML = 'Bass boost applied successfully!';
+   speak('Bass boost applied successfully!');
+   }, 2000);
+   }
+   
+   function changeTempo() {
+   report.innerHTML = 'Changing tempo...';
+   speak('Changing tempo...');
+   setTimeout(() => {
+   report.innerHTML = 'Tempo changed successfully!';
+   speak('Tempo changed successfully!');
+   }, 2000);
+   }
+   
+   function changePitch() {
+   report.innerHTML = 'Changing pitch...';
+   speak('Changing pitch...');
+   setTimeout(() => {
+   report.innerHTML = 'Pitch changed successfully!';
+   speak('Pitch changed successfully!');
+   }, 2000);
+   }
+   
+   function openEqualizer() {
+   report.innerHTML = 'Opening equalizer...';
+   speak('Opening equalizer...');
+   setTimeout(() => {
+   report.innerHTML = 'Equalizer opened!';
+   speak('Equalizer opened!');
+   }, 2000);
+   }
+   const reverbEchoBtn = document.getElementById('reverbEchoBtn');
+   
+   // Add event listener for reverb and echo button
+   reverbEchoBtn.addEventListener('click', applyReverbAndEcho);
+   
+   function applyReverbAndEcho() {
+     // Logic to apply reverb and echo effects to the melody
+     report.innerHTML = 'Applying reverb and echo effects...';
+     speak('Applying reverb and echo effects...');
+     setTimeout(() => {
+       report.innerHTML = 'Reverb and echo effects applied successfully!';
+       speak('Reverb and echo effects applied successfully!');
+     }, 2000);
+   }
+   
+   
+   function visualizeAudio() {
+   const canvas = visualizerCanvas;
+   const canvasCtx = canvas.getContext('2d');
+   const WIDTH = canvas.width;
+   const HEIGHT = canvas.height;
+   const bufferLength = analyser.frequencyBinCount;
+   const dataArray = new Uint8Array(bufferLength);
+   
+   function animate() {
+     animationFrameId = requestAnimationFrame(animate);
+     analyser.getByteFrequencyData(dataArray);
+   
+     canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
+   
+     const barWidth = (WIDTH / bufferLength) * 2.5;
+     let barHeight;
+     let x = 0;
+   
+     for (let i = 0; i < bufferLength; i++) {
+       barHeight = dataArray[i] / 2;
+   
+       canvasCtx.fillStyle = `rgb(${barHeight + 100},50,50)`;
+       canvasCtx.fillRect(x, HEIGHT - barHeight, barWidth, barHeight);
+   
+       x += barWidth + 1;
+     }
+   }
+   
+   animate();
+   }
+    </script>
 </body>
 </html>
