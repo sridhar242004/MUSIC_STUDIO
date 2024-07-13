@@ -34,7 +34,7 @@
             flex-direction: column;
         }
 
-        .container {
+       .container {
             max-width: 1600px;
             margin: 0 auto;
             padding: 2rem;
@@ -72,21 +72,21 @@
             opacity: 0.5;
         }
 
-        .subtitle {
+       .subtitle {
             font-size: 1.5rem;
             opacity: 0.8;
             font-weight: 300;
             letter-spacing: 2px;
         }
 
-        .neon-grid {
+       .neon-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 2rem;
             margin-bottom: 4rem;
         }
 
-        .neon-item {
+       .neon-item {
             background: var(--glass-bg);
             backdrop-filter: blur(10px);
             border-radius: 20px;
@@ -96,12 +96,12 @@
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
         }
 
-        .neon-item:hover {
+       .neon-item:hover {
             transform: translateY(-10px) scale(1.02);
             box-shadow: 0 10px 30px rgba(0, 255, 255, 0.2);
         }
 
-        .neon-item h2 {
+       .neon-item h2 {
             font-family: 'Orbitron', sans-serif;
             font-size: 1.8rem;
             margin-bottom: 1.5rem;
@@ -109,14 +109,14 @@
             text-shadow: 0 0 10px var(--primary-color);
         }
 
-        .controls {
+       .controls {
             display: flex;
             flex-wrap: wrap;
             gap: 1rem;
             margin-bottom: 2rem;
         }
 
-        button, .upload-btn {
+        button,.upload-btn {
             background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
             border: none;
             color: var(--background-color);
@@ -129,12 +129,11 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             position: relative;
-            overflow: hidden;
+            overflow:hidden;
         }
 
-        button::before, .upload-btn::before {
-            content: '';
-            position: absolute;
+        button::before,.upload-btn::before {
+            content: '';position: absolute;
             top: -50%;
             left: -50%;
             width: 200%;
@@ -146,13 +145,13 @@
             opacity: 0;
         }
 
-        button:hover::before, .upload-btn:hover::before {
+        button:hover::before,.upload-btn:hover::before {
             left: -100%;
             top: -100%;
             opacity: 1;
         }
 
-        button:hover, .upload-btn:hover {
+        button:hover,.upload-btn:hover {
             transform: scale(1.05);
             box-shadow: 0 0 20px var(--primary-color);
         }
@@ -202,7 +201,7 @@
             resize: vertical;
         }
 
-        .task {
+       .task {
             margin-top: 2rem;
             padding: 2rem;
             background: var(--glass-bg);
@@ -212,18 +211,18 @@
             transition: all 0.3s ease;
         }
 
-        .task:hover {
+       .task:hover {
             transform: translateY(-5px);
             box-shadow: 0 5px 15px rgba(0, 255, 255, 0.2);
         }
 
-        .task h3 {
+       .task h3 {
             font-family: 'Orbitron', sans-serif;
             color: var(--accent-color);
             margin-bottom: 1rem;
         }
 
-        .music-notes-container {
+       .music-notes-container {
             position: fixed;
             bottom: 2rem;
             right: 2rem;
@@ -238,12 +237,12 @@
             100% { transform: translateY(0px) rotate(0deg); }
         }
 
-        .music-notes {
+       .music-notes {
             animation: float 3s ease-in-out infinite;
             text-shadow: 0 0 10px var(--accent-color);
         }
 
-        .glow-effect {
+       .glow-effect {
             position: absolute;
             width: 100%;
             height: 100%;
@@ -265,9 +264,56 @@
             h1 {
                 font-size: 3rem;
             }
-            .neon-grid {
+           .neon-grid {
                 grid-template-columns: 1fr;
             }
+        }
+
+        /* How to Use popup styles */
+       .how-to-use-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: black;
+            border-radius: 20px;
+            padding: 2rem;
+            width: 80%;
+            max-width: 400px;
+            text-align: center;
+            z-index: 1001;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+       .how-to-use-popup.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+       .how-to-use-popup h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+        }
+
+       .how-to-use-popup p {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            font-weight: 300;
+            letter-spacing: 1px;
+            text-align: justify;
+            margin-bottom: 1rem;
+        }
+
+       .how-to-use-popup button {
+            margin-top: 1rem;
         }
     </style>
 </head>
@@ -323,7 +369,7 @@
 
         <div class="task" id="task1">
             <h3>Mission 1: Vocal Calibration</h3>
-            <p>Initiate a simple scale recording to calibrate your vocal interface.</p>
+            <p>Initiate asimple scale recording to calibrate your vocal interface.</p>
         </div>
 
         <div class="task" id="task2" style="display: none;">
@@ -347,6 +393,44 @@
         <div class="music-notes">♪</div>
         <div class="music-notes">♫</div>
     </div>
+
+    <!-- How to Use popup -->
+    <div class="how-to-use-popup">
+        <h2>How to Use NeoSonic</h2>
+        <p>
+            Welcome to NeoSonic, the advanced music studio! Follow these steps to create your own unique music:
+        </p>
+        <ol>
+            <li>
+                Click the "Record" button to start recording your voice or upload an audio file using the "Upload Song" button.
+            </li>
+            <li>
+                Apply audio effects like Bass Boost, Tempo Shift, Pitch Bend, and Equalizer to enhance your audio.
+            </li>
+            <li>
+                Use the AI Lyric Recognition button to automatically generate lyrics or craft your lyrics manually in the text area.
+            </li>
+            <li>
+                Visualize your audio using the visualizer and download your creation using the "Download Your Creation" button.
+            </li>
+        </ol>
+        <button class="close-popup-btn">Got it!</button>
+    </div>
+
+    <script>
+        const howToUsePopup = document.querySelector('.how-to-use-popup');
+        const closePopupBtn = document.querySelector('.close-popup-btn');
+
+        // Show the How to Use popup on page load
+        window.addEventListener('load', () => {
+            howToUsePopup.classList.add('show');
+        });
+
+        // Close the How to Use popup
+        closePopupBtn.addEventListener('click', () => {
+            howToUsePopup.classList.remove('show');
+        });
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/tamil-web-utils@1.0.0/dist/tamil-web-utils.min.js"></script>
     <script>
@@ -374,7 +458,7 @@
       const recognizedLyricsContainer = document.getElementById('recognizedLyrics');
       let currentTask = 0;
       let mediaRecorder;
-      let audioChunks = [];
+      let audioChunks =[];
       let audioContext;
       let analyser;
       let animationFrameId;
@@ -485,7 +569,7 @@
    }
    
    async function analyzeAudio(file) {
-   report.innerHTML = 'Analyzing the uploaded song...';
+   report.innerHTML= 'Analyzing the uploaded song...';
    speak('Analyzing the uploaded song...');
    try {
    const audioContext = new AudioContext();
@@ -568,7 +652,6 @@
      speak('Manual lyrics recognition complete!');
    }
    
-   
    function applyBassBoost() {
    report.innerHTML = 'Applying bass boost...';
    speak('Applying bass boost...');
@@ -591,7 +674,7 @@
    report.innerHTML = 'Changing pitch...';
    speak('Changing pitch...');
    setTimeout(() => {
-   report.innerHTML = 'Pitch changed successfully!';
+   report.innerHTML= 'Pitch changed successfully!';
    speak('Pitch changed successfully!');
    }, 2000);
    }
@@ -619,37 +702,38 @@
      }, 2000);
    }
    
-   
    function visualizeAudio() {
-   const canvas = visualizerCanvas;
-   const canvasCtx = canvas.getContext('2d');
-   const WIDTH = canvas.width;
-   const HEIGHT = canvas.height;
-   const bufferLength = analyser.frequencyBinCount;
-   const dataArray = new Uint8Array(bufferLength);
-   
-   function animate() {
-     animationFrameId = requestAnimationFrame(animate);
-     analyser.getByteFrequencyData(dataArray);
-   
-     canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
-   
-     const barWidth = (WIDTH / bufferLength) * 2.5;
-     let barHeight;
-     let x = 0;
-   
-     for (let i = 0; i < bufferLength; i++) {
-       barHeight = dataArray[i] / 2;
-   
-       canvasCtx.fillStyle = `rgb(${barHeight + 100},50,50)`;
-       canvasCtx.fillRect(x, HEIGHT - barHeight, barWidth, barHeight);
-   
-       x += barWidth + 1;
-     }
-   }
-   
-   animate();
-   }
+    const canvas = visualizerCanvas;
+    const canvasCtx = canvas.getContext('2d');
+    const WIDTH = canvas.width;
+    const HEIGHT = canvas.height;
+    const bufferLength = analyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+
+    function animate() {
+        animationFrameId = requestAnimationFrame(animate);
+        analyser.getByteFrequencyData(dataArray);
+
+        canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
+
+        const barWidth = (WIDTH / bufferLength) * 2.5;
+        let barHeight;
+        let x = 0;
+
+        for (let i = 0; i < bufferLength; i++) {
+            barHeight = dataArray[i] / 2;
+
+            // Corrected fillStyle using template literals
+            canvasCtx.fillStyle = `rgb(${barHeight + 100}, 50, 50)`;
+            canvasCtx.fillRect(x, HEIGHT - barHeight, barWidth, barHeight);
+
+            x += barWidth + 1;
+        }
+    }
+
+    animate();
+}
+
     </script>
 </body>
 </html>
